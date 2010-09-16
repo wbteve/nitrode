@@ -19,78 +19,21 @@ exports.createServer = function(handle, config) {
 	}
 	
 	return new Server(config);
-	
-	/*
-	var config_example = {
-
-		server: {
-			port: 80,
-			host: undefined,
-			expose: true,
-			chunked: true,
-			keepalive: true,
-			error: function(code, message) { },
-			mimes: { },
-			index: "index.html"
-		},
-		compress: {
-			mimes: []
-		},
-		pubdir: {
-			path: /var/wwwroot/(.+)/,
-			cache: 3600 * 24 * 365,			
-			ssi: true,
-			parrot: {
-				enabled: true,
-				sandbox: {},
-				buffer: false
-				// Any other parrot options
-			}
-		},
-		vhost: {
-		  'game.kohark.com': http.createServer(function(req, resp) {})
-		},
-		rewrite: [{
-			path: /(.+)favicon.ico/,
-			location: '../../' + __dirname
-		}],
-		auth: [{
-			path: '',
-			callback: function(user, pass) { },
-			realm: 'Secure Area',
-			retries: 5,
-			timeout: 60
-		}],
-		ssl: {
-			cert: undefined,
-			key: undefined
-		},
-		request: {
-			handle: function(req, res) {},
-		},
-		stats: {
-			interval: 1000, // 1 second
-			callback: function(stats) { }
-		},
-		trottle: {
-			connections: 15000
-		}
-	}
-	*/
 }
 
 var Server = exports.Server = function(config) {
 
 	var layers = {
+		stats:	  {},
+		vhost:	  {},
 		server:   {},
-		vhost:	{},
-		compress: {},
+		throttle: {},
 		rewrite:  {},
 		ssl:	  [],
-		auth:	 [],
+		auth:	  [],
+		filters:  {},
 		pubdir:   {},
 		request:  {},
-		stats:	{}
 	};
 
 	this.config = {};
@@ -106,17 +49,35 @@ var Server = exports.Server = function(config) {
 	http.Server.call(this, this.handle);
 }
 
-Server.version = "0.3.4";
+Server.version = "0.4.0";
 
 sys.inherits(Server, http.Server);
 
 Server.prototype.handle = function(req, res) {
-
-	for (var index in this.stack) {
+	
+	var index = -1,
+		self  = this;
+	
+	function next(err) {
 		
-		if (this.stack[index].call(this, req, res, this) === false) {
-
-			break;
+		index++;
+		
+		if (err === false) {
+			
+			return;
+		}
+		else if ( ! isNaN(err)) {
+			
+			res.writeHead(err);
+			res.end();
+			
+			return;
+		}
+		else {
+			
+			self.stack[index].call(self, req, res, next, self);
 		}
 	}
+	
+	next();
 };

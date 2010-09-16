@@ -1,10 +1,16 @@
 
 body {
-    font-family: Arial, Helvatica;
+	font-family: Arial, Helvatica;
 }
 
 #wrapper {
-    width: 350px;
-    margin: auto;
-    margin-top: 150px;
+	width: 350px;
+	margin: auto;
+	margin-top: 150px;
+}
+
+p.footer {
+	margin-top: 20px;
+	font-size: 11px;
+	text-align: center;
 }
