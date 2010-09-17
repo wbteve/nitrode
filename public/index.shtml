@@ -8,6 +8,13 @@
 			<h1>Welcome to Nitrode!</h1>
 			<p class="content">
 				Your Nitrode installation is complete, and is working correctly!
+				<p />
+				Testing Parrot:
+				<ul>
+				<% for(var i = 0; i < 10; i++) : %>
+					<li>List item #<%= i %></li>
+				<% endfor; %>
+				</ul>
 			</p>
 			<!--#include file="include/footer.html"-->
 		</div>
