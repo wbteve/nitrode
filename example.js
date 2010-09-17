@@ -25,10 +25,12 @@ var srv = nitrode.createServer({
 			mimes: [/.+/],
 			config: { }
 		},
+		/*
 		compress: {
 			mimes: [/text\/.+/, /message\/.+/, /.+\/.+\\+xml/, /.+\/xml-.+/, /.+\/atom+xml/, /.+\/xml-dtd/, /.+\/javascript/, /.+\/json/, /.+\/rtf/, /.+\/xml/],
 			config: { }
 		}
+		*/
 	},
 	auth: [{
 		path: /.+/,
