@@ -1,3 +1,0 @@
-[submodule "lib/filters/parrot"]
-	path = lib/filters/parrot
-	url = git://github.com/ollym/parrot.git
