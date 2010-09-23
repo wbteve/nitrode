@@ -1,3 +1,9 @@
 [submodule "lib/filters/parrot"]
 	path = lib/filters/parrot
 	url = git@github.com:ollym/parrot.git
+[submodule "lib/comet"]
+	path = lib/comet
+	url = git@github.com:ollym/comet.git
+[submodule "public/chat/js/comet"]
+	path = public/chat/js/comet
+	url = git@github.com:ollym/comet-client.git

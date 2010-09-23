@@ -2,7 +2,14 @@ var http = require('http'),
 	sys	 = require('sys');
 
 exports.createServer = function(handle, config) {
+	
+	return new Server(handle, config);
+}
 
+var Server = exports.Server = function(handle, config) {
+
+	this.stack  = [];
+	
 	if (typeof handle != 'function') {
 
 		config = handle;
@@ -10,46 +17,20 @@ exports.createServer = function(handle, config) {
 	else {
 
 		config = config || {};
-		config.request = config.request || {};
-
-		if ( ! 'handle' in config.request) {
-
-			config.request.handle = handle;
-		}
 	}
 	
-	return new Server(config);
-}
-
-var Server = exports.Server = function(config) {
-
-	var layers = {
-		stats:	  {},
-		vhost:	  {},
-		server:   {},
-		throttle: {},
-		rewrite:  {},
-		ssl:	  [],
-		auth:	  [],
-		filters:  {},
-		pubdir:   {},
-		request:  {},
-	};
-
-	this.config = {};
-	this.stack  = [];
-
-	for (var name in layers) {
-
-		this.config[name] = config[name] || layers[name];
+	this.on('processed', handle);
+	
+	for (var layer in config) {
 		
-		require('./lib/' + name).call(this, this.config[name], this);
+		require('./lib/' + layer)
+			.call(this, this.config[layer], this);
 	}
 
 	http.Server.call(this, this.handle);
 }
 
-Server.version = "0.4.1";
+Server.version = "0.5.0";
 
 sys.inherits(Server, http.Server);
 
@@ -62,7 +43,12 @@ Server.prototype.handle = function(req, res) {
 		
 		index++;
 		
-		if (err === false) {
+		if (index == self.stack.length) {
+			
+			self.emit('processed', req, res);
+			return;
+		}
+		else if (err === false) {
 			
 			return;
 		}
